@@ -1,0 +1,95 @@
+CREATE TABLE Filial
+(
+      pk_cnpj_filial  number(16)  primary key,
+      gerente_filial  varchar(50) NOT NULL,
+      cidade_filial   varchar(50) NOT NULL,
+      bairro_filial   varchar(50) NOT NULL,
+      rua_filial      varchar(50) NOT NULL,
+      estado_filial   varchar(50) NOT NULL,
+      ddd_filial      number(3)   NOT NULL,
+      telefine_filial number(9)   NOT NULL
+);
+
+
+CREATE TABLE Fornecedor
+(
+      pk_cnpj_fn  number(11)  primary key,
+      estado_fn   varchar(50) NOT NULL,
+      cidade_fn   varchar(50) NOT NULL,
+      bairro_fn   varchar(50) NOT NULL,
+      rua_fn      varchar(50) NOT NULL,
+      ddd_fn      number(3)   NOT NULL,
+      telefone_fn number(9)   NOT NULL
+);
+
+
+CREATE TABLE Estoque
+(
+      pk_cod_produto number(8)   primary key,
+      fk_cnpj_filial number(16)  NOT NULL,
+      nome_prod      varchar(50) NOT NULL,
+      tipo_prod      varchar(50) NOT NULL,
+      qtd_prod       number(5)   NOT NULL
+
+      CONSTRAINT fk_cnpj_filial FOREIGN KEY (fk_cnpj_filial) REFERENCES Filial (pk_cnpj_filial)
+);
+
+
+CREATE TABLE R_FN_ESTOQUE 
+(   
+      pk_notafiscal     number(20)   NOT NULL,
+      fk_pk_cnpj_fn     number(16)   NOT NULL,
+      fk_pk_cod_produto number(8)    NOT NULL,
+      lote_fab          number(8)    NOT NULL,
+      data_fab          Date         NOT NULL,
+      data_venc         Date         NOT NULL,
+
+      CONSTRAINT fk_pk_cnpj_fn     FOREIGN KEY (fk_pk_cnpj_fn)     REFERENCES Fornecedor (pk_cnpj_fn),
+      CONSTRAINT fk_pk_cod_produto FOREIGN KEY (fk_pk_cod_produto) REFERENCES Estoque    (pk_cod_produto),
+      CONSTRAINT pk_Fornecido      PRIMARY KEY (fk_pk_cnpj_fn, fk_pk_cod_produto, pk_notafiscal)
+);
+
+
+CREATE TABLE Confeiteiro
+(
+      pk_cpf_conf   number (11) primary key,
+      nome_conf     varchar(50) NOT NULL,
+      especialidade varchar(50) NOT NULL
+);
+
+
+CREATE TABLE R_CONF_FILIAL
+(
+      pk_data_contrato   Date         NOT NULL,
+      fk_pk_cpf_conf     number(11)   NOT NULL,
+      fk_pk_cnpj_filial  number(16)   NOT NULL,
+
+      CONSTRAINT fk_pk_cpf_conf    FOREIGN KEY (fk_pk_cpf_conf) REFERENCES Confeiteiro (pk_cpf_conf),
+      CONSTRAINT fk_pk_cnpj_filial FOREIGN KEY (fk_pk_cnpj_filial) REFERENCES Filial (pk_cnpj_filial),
+      CONSTRAINT pk_Contratado     PRIMARY KEY (fk_pk_cnpj_filial, fk_pk_cpf_conf, pk_data_contrato)
+);
+
+
+CREATE TABLE Cliente
+(
+      pk_cpf_cliente   number(11)  primary key,
+      nome_cliente     varchar(50) NOT NULL,
+      ddd_cliente      number(3)   NOT NULL,
+      telefone_cliente number(9)   NOT NULL
+);
+
+CREATE TABLE Pedido
+(
+      pk_cod_pedido   number(12)   primary key,
+      fk_cpf_cliente  number(11)   NOT NULL,
+      fk_cpf_conf     number(11)   NOT NULL,
+      data_pedido     Date         NOT NULL,
+      data_entrega    Date         NOT NULL,
+      tipo_pedido     varchar(50)  NOT NULL,
+      qtd_pedido      number(5)    NOT NULL,
+      valor_pedido    decimal(5,2) NOT NULL,
+      hora_entrega    timestamp    NOT NULL,
+      
+      CONSTRAINT fk_cpf_cliente FOREIGN KEY (fk_cpf_cliente) REFERENCES Cliente     (pk_cpf_cliente),
+      CONSTRAINT fk_cpf_conf    FOREIGN KEY (fk_cpf_conf)    REFERENCES Confeiteiro (pk_cpf_conf)
+);
